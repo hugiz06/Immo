@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ImmoMatch"/>
+<meta name="theme-color" content="#0f172a"/>
+<title>ImmoMatch · Le Cercle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #273548;
+    --border: #334155;
+    --accent: #3b82f6;
+    --accent2: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior: none;
+  }
+  #app { display: flex; flex-direction: column; height: 100vh; height: -webkit-fill-available; }
+
+/* HEADER */
+.header {
+background: var(–surface);
+padding: 52px 20px 16px;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+.header-inner { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-size: 28px; }
+.header-title { font-size: 18px; font-weight: 800; line-height: 1.2; }
+.header-sub { font-size: 12px; color: var(–muted); }
+
+/* NAV */
+.nav {
+display: flex;
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+overflow-x: auto;
+flex-shrink: 0;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+flex: 1; min-width: 80px; padding: 12px 8px;
+background: transparent; border: none; border-bottom: 2px solid transparent;
+color: var(–muted); font-family: ‘Sora’, sans-serif;
+font-size: 12px; font-weight: 600; cursor: pointer;
+transition: all .2s; white-space: nowrap;
+}
+.nav-btn.active { color: var(–accent); border-bottom-color: var(–accent); }
+
+/* CONTENT */
+.content {
+flex: 1; overflow-y: auto; padding: 16px;
+padding-bottom: calc(16px + var(–safe-bottom));
+-webkit-overflow-scrolling: touch;
+}
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-card {
+background: var(–surface); border-radius: 14px; padding: 14px;
+border: 1px solid var(–border); display: flex; flex-direction: column; gap: 4px;
+}
+.stat-icon { font-size: 22px; }
+.stat-val { font-size: 26px; font-weight: 800; }
+.stat-lbl { font-size: 11px; color: var(–muted); font-weight: 600; }
+
+/* CARDS */
+.card {
+background: var(–surface); border-radius: 14px; padding: 14px;
+margin-bottom: 10px; border: 1px solid var(–border);
+}
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.card-title { font-size: 15px; font-weight: 700; }
+.card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.card-stats { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+.cs { display: flex; flex-direction: column; }
+.cs-val { font-size: 13px; font-weight: 700; }
+.cs-lbl { font-size: 10px; color: var(–muted); }
+.card-note { font-size: 12px; color: var(–muted); margin-top: 8px; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-right: 4px; }
+.badge-blue { background: rgba(59,130,246,.2); color: #93c5fd; }
+.badge-gray { background: rgba(148,163,184,.15); color: var(–muted); }
+.badge-green { background: rgba(16,185,129,.2); color: #6ee7b7; }
+.badge-orange { background: rgba(249,115,22,.2); color: #fdba74; }
+.badge-red { background: rgba(239,68,68,.2); color: #fca5a5; }
+
+/* BUTTONS */
+.btn { border: none; border-radius: 10px; font-family: ‘Sora’, sans-serif; font-weight: 700; cursor: pointer; transition: opacity .15s; }
+.btn:active { opacity: .75; }
+.btn-primary { background: var(–accent); color: white; padding: 13px 18px; font-size: 14px; width: 100%; }
+.btn-dark { background: var(–surface2); color: var(–text); padding: 13px 18px; font-size: 14px; }
+.btn-sm { background: var(–surface2); color: var(–muted); padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+.btn-match { background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; padding: 7px 12px; font-size: 12px; }
+.btn-row { display: flex; gap: 8px; }
+
+/* SCORE RING */
+.score-ring {
+width: 54px; height: 54px; border-radius: 50%;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+flex-shrink: 0; border: 3px solid;
+}
+.score-num { font-size: 17px; font-weight: 800; line-height: 1; }
+.score-denom { font-size: 9px; opacity: .7; }
+
+/* MATCH CARD */
+.match-result-card {
+background: var(–surface); border-radius: 14px; padding: 14px;
+margin-bottom: 10px; border-left: 4px solid;
+border-top: 1px solid var(–border);
+border-right: 1px solid var(–border);
+border-bottom: 1px solid var(–border);
+}
+.match-body { display: flex; gap: 12px; align-items: flex-start; }
+.match-info { flex: 1; }
+.conseil-box {
+background: rgba(59,130,246,.1); border-left: 3px solid var(–accent);
+border-radius: 8px; padding: 8px 10px; font-size: 12px;
+color: #93c5fd; font-style: italic; margin: 8px 0;
+}
+.point { font-size: 12px; margin-bottom: 3px; }
+
+/* ALERTS */
+.alerts-box { background: var(–surface); border-radius: 14px; padding: 14px; margin-bottom: 14px; border: 1px solid var(–border); }
+.alert-item { padding: 8px 10px; border-radius: 8px; font-size: 12px; margin-bottom: 6px; border-left: 3px solid; }
+.alert-success { background: rgba(16,185,129,.1); color: #6ee7b7; border-color: var(–accent2); }
+.alert-error { background: rgba(239,68,68,.1); color: #fca5a5; border-color: var(–danger); }
+
+/* MODAL */
+.modal-back {
+position: fixed; inset: 0; background: rgba(0,0,0,.7);
+display: flex; align-items: flex-end; justify-content: center;
+z-index: 200; backdrop-filter: blur(4px);
+}
+.modal-box {
+background: var(–surface); border-radius: 20px 20px 0 0;
+padding: 24px 18px calc(24px + var(–safe-bottom));
+width: 100%; max-width: 680px; max-height: 92vh; overflow-y: auto;
+border-top: 1px solid var(–border);
+}
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 18px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 12px; font-weight: 700; color: var(–muted); text-transform: uppercase; letter-spacing: .04em; }
+.form-input {
+background: var(–bg); border: 1px solid var(–border); border-radius: 10px;
+padding: 11px 12px; font-family: ‘Sora’, sans-serif; font-size: 14px;
+color: var(–text); outline: none; width: 100%;
+transition: border-color .2s;
+}
+.form-input:focus { border-color: var(–accent); }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.modal-actions .btn-dark { flex: 1; }
+.modal-actions .btn-primary { flex: 2; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 48px 20px; color: var(–muted); }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-weight: 700; font-size: 16px; color: var(–text); margin-bottom: 4px; }
+.empty-sub { font-size: 13px; }
+
+/* LOADING */
+.loading { text-align: center; padding: 48px 20px; }
+.spinner {
+width: 44px; height: 44px; border-radius: 50%;
+border: 3px solid var(–border); border-top-color: var(–accent);
+animation: spin .8s linear infinite; margin: 16px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* CLIENT HEADER CARD */
+.client-header {
+background: linear-gradient(135deg, #1e3a5f, #1e293b);
+border-radius: 14px; padding: 16px; margin-bottom: 14px;
+border: 1px solid #2563eb44;
+}
+
+/* SECTION TITLE */
+.section-title { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(–text); }
+
+.quick-actions { display: flex; gap: 8px; margin-bottom: 16px; }
+.quick-actions .btn-primary { flex: 1; }
+.quick-actions .btn-dark { flex: 1; }
+
+select option { background: #1e293b; }
+</style>
+
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-inner">
+      <span class="header-logo">🏡</span>
+      <div>
+        <div class="header-title">Le Cercle · ImmoMatch</div>
+        <div class="header-sub">Senlis · Oise</div>
+      </div>
+    </div>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal-back" id="modal" style="display:none"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const TYPES = ["Maison","Appartement","Villa","Studio","Duplex","Terrain","Local commercial","Immeuble"];
+const ETATS = ["Neuf","Bon état","À rafraîchir","À rénover"];
+const SECTEURS = ["Senlis","Chantilly","Creil","Compiègne","Clermont","Pont-Sainte-Maxence","Verberie","Nanteuil-le-Haudouin","Autre Oise"];
+
+const db = {
+  biens:   JSON.parse(localStorage.getItem("lc_biens")   || "[]"),
+  clients: JSON.parse(localStorage.getItem("lc_clients") || "[]"),
+  matches: JSON.parse(localStorage.getItem("lc_matches") || "[]"),
+  alerts:  [],
+};
+const persist = () => {
+  localStorage.setItem("lc_biens",   JSON.stringify(db.biens));
+  localStorage.setItem("lc_clients", JSON.stringify(db.clients));
+  localStorage.setItem("lc_matches", JSON.stringify(db.matches));
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const fmt = n => n ? Number(n).toLocaleString("fr-FR") + " €" : "—";
+const scoreColor = s => s >= 80 ? "#10b981" : s >= 60 ? "#f59e0b" : s >= 40 ? "#f97316" : "#ef4444";
+const verdictBadge = v => {
+  if (v === "Excellent match") return "badge-green";
+  if (v === "Bon match")       return "badge-blue";
+  if (v === "Match partiel")   return "badge-orange";
+  return "badge-red";
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let currentTab = "dashboard";
+let matchResult = null;
+let aiLoading   = false;
+
+// ═══════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════
+function render() {
+  renderNav();
+  renderContent();
+}
+
+function renderNav() {
+  const tabs = [
+    { id:"dashboard", label:"📊 Tableau" },
+    { id:"biens",     label:`🏠 Biens (${db.biens.length})` },
+    { id:"clients",   label:`👥 Clients (${db.clients.length})` },
+    { id:"matching",  label:"🎯 Matching" },
+  ];
+  document.getElementById("nav").innerHTML = tabs.map(t =>
+    `<button class="nav-btn ${currentTab===t.id?'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`
+  ).join("");
+}
+
+function renderContent() {
+  const el = document.getElementById("content");
+  if      (currentTab === "dashboard") el.innerHTML = renderDashboard();
+  else if (currentTab === "biens")     el.innerHTML = renderBiens();
+  else if (currentTab === "clients")   el.innerHTML = renderClients();
+  else if (currentTab === "matching")  el.innerHTML = renderMatching();
+}
+
+function setTab(t) { currentTab = t; render(); }
+
+// ─── Dashboard ──────────────────────────────────────────
+function renderDashboard() {
+  const topScore = db.matches.length ? Math.max(...db.matches.map(m=>m.topScore)) : null;
+  const stats = [
+    { icon:"🏠", val: db.biens.length,   lbl:"Biens actifs",  color:"#3b82f6" },
+    { icon:"👥", val: db.clients.length, lbl:"Clients",       color:"#8b5cf6" },
+    { icon:"🎯", val: db.matches.length, lbl:"Matchings IA",  color:"#10b981" },
+    { icon:"⭐", val: topScore ? topScore+"/100" : "—", lbl:"Top score", color:"#f59e0b" },
+  ];
+
+  let html = `<div class="stats-grid">`;
+  stats.forEach(s => {
+    html += `<div class="stat-card" style="border-top:3px solid ${s.color}">
+      <span class="stat-icon">${s.icon}</span>
+      <span class="stat-val" style="color:${s.color}">${s.val}</span>
+      <span class="stat-lbl">${s.lbl}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  if (db.alerts.length > 0) {
+    html += `<div class="alerts-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-weight:700;font-size:13px">🔔 Alertes</span>
+        <button class="btn btn-sm" onclick="db.alerts=[];render()">Effacer</button>
+      </div>`;
+    db.alerts.slice(0,5).forEach(a => {
+      html += `<div class="alert-item ${a.type==='success'?'alert-success':'alert-error'}">${a.msg}</div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div class="quick-actions">
+    <button class="btn btn-primary" onclick="openBienForm()">🏠 Nouveau bien</button>
+    <button class="btn btn-dark" onclick="openClientForm()">👤 Nouveau client</button>
+  </div>`;
+
+  if (db.matches.length > 0) {
+    html += `<div class="section-title">Derniers matchings</div>`;
+    db.matches.slice(0,5).forEach(m => {
+      const c = db.clients.find(x=>x.id===m.clientId);
+      const b = db.biens.find(x=>x.id===m.topBienId);
+      const col = scoreColor(m.topScore);
+      html += `<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px"
+        onclick="matchResult={clientId:'${m.clientId}',results:${JSON.stringify(m.results).replace(/'/g,"&#39;")}};setTab('matching')">
+        <div class="score-ring" style="border-color:${col};background:${col}18;color:${col}">
+          <span class="score-num">${m.topScore}</span>
+          <span class="score-denom">/100</span>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${c?.nom || "Client supprimé"}</div>
+          <div style="font-size:11px;color:var(--muted)">Meilleur bien : ${b?.ref||"—"} · ${new Date(m.date).toLocaleDateString("fr-FR")}</div>
+        </div>
+        <span style="color:var(--muted)">›</span>
+      </div>`;
+    });
+  }
+
+  return html;
+}
+
+// ─── Biens ──────────────────────────────────────────────
+function renderBiens() {
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <span class="section-title" style="margin:0">Biens (${db.biens.length})</span>
+    <button class="btn btn-primary" style="width:auto;padding:10px 14px;font-size:13px" onclick="openBienForm()">+ Ajouter</button>
+  </div>`;
+
+  if (!db.biens.length) return html + `<div class="empty">
+    <div class="empty-icon">🏠</div>
+    <div class="empty-title">Aucun bien</div>
+    <div class="empty-sub">Ajoutez vos premiers biens à la vente</div>
+  </div>`;
+
+  db.biens.forEach(b => {
+    html += `<div class="card">
+      <div class="card-header">
+        <div>
+          <span class="badge badge-blue">${b.ref}</span>
+          <span class="badge badge-gray">${b.type}</span>
+          <span class="badge badge-gray">${b.secteur}</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-sm" onclick='openBienForm(${JSON.stringify(b).replace(/'/g,"&#39;")})'>✏️</button>
+          <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteBien('${b.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="card-stats">
+        <div class="cs"><span class="cs-val">${fmt(b.prix)}</span><span class="cs-lbl">Prix</span></div>
+        <div class="cs"><span class="cs-val">${b.surface||"—"} m²</span><span class="cs-lbl">Surface</span></div>
+        <div class="cs"><span class="cs-val">${b.pieces||"—"}</span><span class="cs-lbl">Pièces</span></div>
+        <div class="cs"><span class="cs-val">${b.etat}</span><span class="cs-lbl">État</span></div>
+      </div>
+      ${b.description ? `<div class="card-note">${b.description}</div>` : ""}
+    </div>`;
+  });
+  return html;
+}
+
+// ─── Clients ────────────────────────────────────────────
+function renderClients() {
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <span class="section-title" style="margin:0">Clients (${db.clients.length})</span>
+    <button class="btn btn-primary" style="width:auto;padding:10px 14px;font-size:13px" onclick="openClientForm()">+ Ajouter</button>
+  </div>`;
+
+  if (!db.clients.length) return html + `<div class="empty">
+    <div class="empty-icon">👥</div>
+    <div class="empty-title">Aucun client</div>
+    <div class="empty-sub">Ajoutez vos acquéreurs et leurs critères</div>
+  </div>`;
+
+  db.clients.forEach(c => {
+    html += `<div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${c.nom}</div>
+          ${c.tel ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">📞 ${c.tel}</div>` : ""}
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-match" onclick="runMatching('${c.id}')">🎯 Matcher</button>
+          <button class="btn btn-sm" onclick='openClientForm(${JSON.stringify(c).replace(/'/g,"&#39;")})'>✏️</button>
+          <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteClient('${c.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="card-stats">
+        <div class="cs"><span class="cs-val">${fmt(c.budget)}</span><span class="cs-lbl">Budget</span></div>
+        <div class="cs"><span class="cs-val">${c.type}</span><span class="cs-lbl">Type</span></div>
+        <div class="cs"><span class="cs-val">${c.surfaceMin ? c.surfaceMin+" m²" : "—"}</span><span class="cs-lbl">Surface min</span></div>
+        <div class="cs"><span class="cs-val">${c.secteurs}</span><span class="cs-lbl">Secteur(s)</span></div>
+      </div>
+      ${c.notes ? `<div class="card-note">📝 ${c.notes}</div>` : ""}
+    </div>`;
+  });
+  return html;
+}
+
+// ─── Matching ───────────────────────────────────────────
+function renderMatching() {
+  if (aiLoading) return `<div class="loading">
+    <div style="font-size:40px">⚙️</div>
+    <div class="spinner"></div>
+    <div style="font-weight:700;font-size:17px">Analyse IA en cours…</div>
+    <div style="color:var(--muted);font-size:13px;margin-top:6px">Comparaison de chaque bien avec les critères client</div>
+  </div>`;
+
+  if (!matchResult) return `<div class="empty">
+    <div class="empty-icon">🎯</div>
+    <div class="empty-title">Aucun matching lancé</div>
+    <div class="empty-sub">Dans "Clients", appuyez sur 🎯 Matcher pour lancer l'analyse IA</div>
+  </div>`;
+
+  const client = db.clients.find(c => c.id === matchResult.clientId);
+  let html = `<div class="client-header">
+    <div style="font-size:11px;color:#93c5fd;font-weight:700;margin-bottom:2px">RÉSULTATS POUR</div>
+    <div style="font-size:18px;font-weight:800">${client?.nom || "Client"}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">
+      Budget ${fmt(client?.budget)} · ${client?.type} · ${client?.secteurs}
+    </div>
+  </div>`;
+
+  matchResult.results.forEach(r => {
+    const bien = db.biens.find(b => b.id === r.id);
+    if (!bien) return;
+    const col = scoreColor(r.score);
+    html += `<div class="match-result-card" style="border-left-color:${col}">
+      <div class="match-body">
+        <div class="score-ring" style="border-color:${col};background:${col}18;color:${col}">
+          <span class="score-num">${r.score}</span>
+          <span class="score-denom">/100</span>
+        </div>
+        <div class="match-info">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            <span class="badge badge-blue">${bien.ref}</span>
+            <span class="badge ${verdictBadge(r.verdict)}">${r.verdict}</span>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:12px">💰 ${fmt(bien.prix)}</span>
+            <span style="font-size:12px">📐 ${bien.surface} m²</span>
+            <span style="font-size:12px">📍 ${bien.secteur}</span>
+          </div>
+          ${r.conseil ? `<div class="conseil-box">💬 ${r.conseil}</div>` : ""}
+          ${(r.points_forts||[]).map(p=>`<div class="point" style="color:#6ee7b7">✅ ${p}</div>`).join("")}
+          ${(r.points_faibles||[]).map(p=>`<div class="point" style="color:#fca5a5">⚠️ ${p}</div>`).join("")}
+        </div>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// CRUD
+// ═══════════════════════════════════════════════════════
+function deleteBien(id) {
+  if (!confirm("Supprimer ce bien ?")) return;
+  db.biens = db.biens.filter(x=>x.id!==id); persist(); render();
+}
+function deleteClient(id) {
+  if (!confirm("Supprimer ce client ?")) return;
+  db.clients = db.clients.filter(x=>x.id!==id); persist(); render();
+}
+function saveBien(b) {
+  const idx = db.biens.findIndex(x=>x.id===b.id);
+  if (idx >= 0) db.biens[idx] = b; else db.biens.push(b);
+  persist(); closeModal(); render();
+}
+function saveClient(c) {
+  const idx = db.clients.findIndex(x=>x.id===c.id);
+  if (idx >= 0) db.clients[idx] = c; else db.clients.push(c);
+  persist(); closeModal(); render();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function openBienForm(bien) {
+  const b = bien || { id:uid(), ref:"", type:"Maison", prix:"", surface:"", pieces:"", secteur:"Senlis", etat:"Bon état", description:"" };
+  const title = bien ? "✏️ Modifier le bien" : "➕ Nouveau bien";
+  const typeOpts = TYPES.map(t => `<option${b.type===t?" selected":""}>${t}</option>`).join("");
+  const etatOpts = ETATS.map(e => `<option${b.etat===e?" selected":""}>${e}</option>`).join("");
+  const sectOpts = SECTEURS.map(s => `<option${b.secteur===s?" selected":""}>${s}</option>`).join("");
+
+  showModal(`<div class="modal-title">${title}</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Référence *</label>
+        <input class="form-input" id="f_ref" value="${b.ref}" placeholder="EX-001"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-input" id="f_type">${typeOpts}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prix (€) *</label>
+        <input class="form-input" id="f_prix" type="number" value="${b.prix}" placeholder="250000"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Surface (m²)</label>
+        <input class="form-input" id="f_surface" type="number" value="${b.surface}" placeholder="90"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pièces</label>
+        <input class="form-input" id="f_pieces" type="number" value="${b.pieces}" placeholder="4"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Secteur</label>
+        <select class="form-input" id="f_secteur">${sectOpts}</select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">État</label>
+        <select class="form-input" id="f_etat">${etatOpts}</select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Description / Notes</label>
+        <textarea class="form-input" id="f_desc" style="height:68px;resize:vertical" placeholder="Garage, jardin, DPE B...">${b.description}</textarea>
+
+```
+  </div>
+</div>
+<div class="modal-actions">
+  <button class="btn btn-dark" onclick="closeModal()">Annuler</button>
+  <button class="btn btn-primary" onclick="
+    const ref=document.getElementById('f_ref').value.trim();
+    const prix=document.getElementById('f_prix').value;
+    if(!ref||!prix){alert('Référence et prix requis');return;}
+    saveBien({
+      id:'${b.id}',
+      ref, prix,
+      type:document.getElementById('f_type').value,
+      surface:document.getElementById('f_surface').value,
+      pieces:document.getElementById('f_pieces').value,
+      secteur:document.getElementById('f_secteur').value,
+      etat:document.getElementById('f_etat').value,
+      description:document.getElementById('f_desc').value
+    })">Enregistrer</button>
+</div>`);
+```
+
+}
+
+function openClientForm(client) {
+const c = client || { id:uid(), nom:””, tel:””, email:””, budget:””, type:“Maison”, surfaceMin:””, secteurs:“Senlis”, notes:”” };
+const title = client ? “✏️ Modifier le client” : “➕ Nouveau client”;
+const typeOpts = TYPES.map(t => `<option${c.type===t?" selected":""}>${t}</option>`).join(””);
+
+showModal(`<div class="modal-title">${title}</div> <div class="form-grid"> <div class="form-group"> <label class="form-label">Nom complet *</label> <input class="form-input" id="c_nom" value="${c.nom}" placeholder="Jean Dupont"/> </div> <div class="form-group"> <label class="form-label">Téléphone</label> <input class="form-input" id="c_tel" value="${c.tel}" placeholder="06 12 34 56 78"/> </div> <div class="form-group"> <label class="form-label">Budget max (€) *</label> <input class="form-input" id="c_budget" type="number" value="${c.budget}" placeholder="300000"/> </div> <div class="form-group"> <label class="form-label">Type recherché</label> <select class="form-input" id="c_type">${typeOpts}</select> </div> <div class="form-group"> <label class="form-label">Surface min (m²)</label> <input class="form-input" id="c_surface" type="number" value="${c.surfaceMin}" placeholder="80"/> </div> <div class="form-group"> <label class="form-label">Secteur(s)</label> <input class="form-input" id="c_secteurs" value="${c.secteurs}" placeholder="Senlis, Chantilly…"/> </div> <div class="form-group full"> <label class="form-label">Critères & notes</label> <textarea class="form-input" id="c_notes" style="height:68px;resize:vertical" placeholder="Garage impératif, plain-pied, proche école…">${c.notes}</textarea> </div> </div> <div class="modal-actions"> <button class="btn btn-dark" onclick="closeModal()">Annuler</button> <button class="btn btn-primary" onclick=" const nom=document.getElementById('c_nom').value.trim(); const budget=document.getElementById('c_budget').value; if(!nom||!budget){alert('Nom et budget requis');return;} saveClient({ id:'${c.id}', nom, budget, tel:document.getElementById('c_tel').value, type:document.getElementById('c_type').value, surfaceMin:document.getElementById('c_surface').value, secteurs:document.getElementById('c_secteurs').value, notes:document.getElementById('c_notes').value, dateAjout:'${c.dateAjout||new Date().toISOString()}' })">Enregistrer</button> </div>`);
+}
+
+function showModal(html) {
+const m = document.getElementById(“modal”);
+m.innerHTML = `<div class="modal-box" onclick="event.stopPropagation()">${html}</div>`;
+m.style.display = “flex”;
+m.onclick = closeModal;
+}
+function closeModal() {
+document.getElementById(“modal”).style.display = “none”;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI MATCHING
+// ═══════════════════════════════════════════════════════
+async function runMatching(clientId) {
+if (db.biens.length === 0) { alert(“Ajoutez des biens d’abord !”); return; }
+const client = db.clients.find(c => c.id === clientId);
+if (!client) return;
+
+aiLoading = true;
+matchResult = null;
+setTab(“matching”);
+
+const prompt = `Tu es un expert en rapprochement immobilier.
+
+CLIENT :
+
+- Nom : ${client.nom}
+- Budget max : ${client.budget} €
+- Type recherché : ${client.type}
+- Surface min : ${client.surfaceMin} m²
+- Secteur(s) : ${client.secteurs}
+- Critères spéciaux : ${client.notes || “aucun”}
+
+BIENS DISPONIBLES :
+${JSON.stringify(db.biens.map(b => ({
+id:b.id, ref:b.ref, type:b.type, prix:b.prix,
+surface:b.surface, secteur:b.secteur, pieces:b.pieces,
+etat:b.etat, description:b.description
+})))}
+
+Pour CHAQUE bien, génère un objet JSON avec :
+
+- id
+- score (0-100)
+- verdict : “Excellent match” | “Bon match” | “Match partiel” | “Non compatible”
+- points_forts : tableau 2-3 phrases courtes
+- points_faibles : tableau 0-2 phrases courtes
+- conseil : phrase d’accroche commerciale pour pitcher ce bien
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans texte ni balises.`;
+
+try {
+const res = await fetch(“https://api.anthropic.com/v1/messages”, {
+method: “POST”,
+headers: { “Content-Type”: “application/json” },
+body: JSON.stringify({
+model: “claude-sonnet-4-20250514”,
+max_tokens: 1000,
+messages: [{ role:“user”, content: prompt }]
+})
+});
+const data = await res.json();
+const raw = (data.content||[]).map(b=>b.text||””).join(””);
+const clean = raw.replace(/`json|`/g,””).trim();
+const parsed = JSON.parse(clean);
+const sorted = parsed.sort((a,b) => b.score - a.score);
+
+```
+matchResult = { clientId, results: sorted };
+const entry = {
+  id: uid(), clientId, date: new Date().toISOString(),
+  topScore: sorted[0]?.score || 0,
+  topBienId: sorted[0]?.id,
+  results: sorted
+};
+db.matches.unshift(entry);
+if (db.matches.length > 50) db.matches = db.matches.slice(0,50);
+persist();
+
+const hot = sorted.filter(r => r.score >= 80);
+if (hot.length) {
+  const bien = db.biens.find(b=>b.id===hot[0].id);
+  db.alerts.unshift({ id:uid(), type:"success",
+    msg:`🔥 Match fort (${hot[0].score}/100) : ${client.nom} ↔ ${bien?.ref||"bien"}` });
+}
+```
+
+} catch(e) {
+db.alerts.unshift({ id:uid(), type:“error”, msg:“Erreur IA : “ + e.message });
+}
+
+aiLoading = false;
+render();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+render();
+</script>
+
+</body>
+</html>
